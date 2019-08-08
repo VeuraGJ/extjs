@@ -1,0 +1,178 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>垃圾问卷调查</title>
+	<link rel="stylesheet" type="text/css" href="./resources/css/ext-all.css" />
+ 	<!-- LIBS -->
+ 	<script type="text/javascript" src="./adapter/ext/ext-base.js"></script>
+ 	<!-- ENDLIBS -->
+    <script type="text/javascript" src="./ext-all.js"></script>
+    <script>
+       Ext.onReady(function(){
+           var navHandler = function(direction){
+               var question = Ext.getCmp('question').layout;
+               var prev = Ext.getCmp('move-prev');
+               var next = Ext.getCmp('move-next');
+               var activeId = question.activeItem.id;
+               if(activeId === 'card-0'){
+                   if(direction === 1){
+                       question.setActiveItem(1);
+                       prev.setDisabled(false);
+                   }
+               }else if(activeId === 'card-1'){
+                   if(direction === -1){
+                       question.setActiveItem(0);
+                       prev.setDisabled(true);
+                   }else{
+                       question.setActiveItem(2);
+                       next.setDisabled(true);
+                   }
+               }else if(activeId === 'card-2'){
+                   if(direction === -1){
+                       question.setActiveItem(1);
+                       next.setDisabled(false);
+                   }
+               }
+           }
+           var question50Answer = ['把粑粑用废报纸包好带回家冲掉',
+                                   '受污染的报纸按有害垃圾处理',
+                                   '没受污染的报纸按可回收垃圾处理',
+                                   '受污染的报纸浸水后当湿垃圾处理'];
+           var panel = new Ext.Panel({
+               renderTo:'test',
+               layout:'card',
+               title:'问卷调查',
+               id:'question',
+               activeItem:0,
+               width:500,
+               height:500,
+               bodyStyle:'padding:15px',
+               style:'position:relative;',
+                x:100,
+                y:200,
+                bbar:[{
+                    id:'move-prev',
+                    text:'上一步',
+                    handler:navHandler.createDelegate(this,[-1]),
+                    disabled:true
+                },'->',{
+                    id:'move-next',
+                    handler:navHandler.createDelegate(this,[1]),
+                    text:'下一步'
+                }],
+                items:[{
+                    id:'card-0',
+                    xtype:'fieldset',
+                    title:'Q1:番茄酱属于以下哪种垃圾？（单选）',
+                    items:[{
+                        xtype: 'radiogroup',
+                        columns: 1,
+                        defaultType:'radio',
+                        id:'radioGroup',
+                        items:[{
+                        boxLabel:'湿垃圾',
+                        name:'garbage',
+                        inputVaule:'湿垃圾'
+                    },{
+                        boxLabel:'干垃圾',
+                        name:'garbage',
+                        inputVaule:'干垃圾',
+                    },{
+                        boxLabel:'有害垃圾',
+                        name:'garbage',
+                        inputVaule:'有害垃圾',
+                    },{
+                        boxLabel:'可回收垃圾',
+                        name:'garbage',
+                        inputVaule:'可回收垃圾',
+                    }],
+                    listeners:{
+                        'change':function(radio,e){
+                            var firstOption = Ext.getCmp('radioGroup').getValue().inputVaule;
+                            Ext.getCmp('card-2').items.items[0].setValue(firstOption);
+                        }
+                    }
+
+                }]
+                },{
+                    id:'card-1',
+                    xtype:'fieldset',
+                    title:'Q50:王大叔出门遛狗后，哪些是正确处理狗粑粑的方法？（多选）',
+                    items:[{
+                        xtype: 'checkboxgroup',
+                        columns: 1,
+                        defaultType:'checkbox',
+                        id:'checkGroup',
+                        items:[{
+                        boxLabel:question50Answer[0],
+                        name:0
+                    },{
+                        boxLabel:question50Answer[1],
+                        name:1,
+                    },{
+                        boxLabel:question50Answer[2],
+                        name:2
+                    },{
+                        boxLabel:question50Answer[3],
+                        name:3
+                    }],
+                    listeners:{
+                        'change':function(checkbox,e){
+                           var secondOption = '';
+                           Ext.getCmp('checkGroup').getValue()
+                           .forEach(item => secondOption = secondOption+item.boxLabel+'\n');
+                           Ext.getCmp('card-2').items.items[1].setValue(secondOption);
+                        }
+                    }
+
+                }]
+                },{
+                    id:'card-2',
+                    xtype:'form',
+                    frame:true,
+                    title:'我的问卷',
+                    bodyStyle:'padding:5px 5px 0',
+                    width:350,
+                    autoHeight:true,
+                    items :[{
+                            fieldLabel: 'Q1的选项',
+                            xtype:'textfield',
+                            id:'firstAnswer',
+                            msgTarget:'under',
+                            name: 'first',
+                            width:200,
+                        },{
+                            fieldLabel: 'Q50的选项',
+                            id:'secondAnswer',
+                            msgTarget:'under',
+                            xtype:'textarea',
+                            width:200,
+                            name: 'last'
+                        }
+                    ],
+                    buttons:[{
+                        text:'提交',
+                        listeners:{
+					    'click': function(btn, e){
+                        if(! Ext.getCmp('firstAnswer').getValue().length||!Ext.getCmp('secondAnswer').getValue().length){
+                            Ext.getCmp('firstAnswer').markInvalid('请答题');
+                            Ext.getCmp('secondAnswer').markInvalid('请答题');
+                        }
+                        else{
+                        Ext.MessageBox.alert("提交","Congratulation!");
+                        Ext.getCmp('firstAnswer').reset();
+                        Ext.getCmp('secondAnswer').reset();
+                        }
+					}}
+                    }]
+
+                }]
+           });
+        });
+    </script>
+</head>
+<body>
+<div id ="test"></div>
+
+</body>
+</html>
